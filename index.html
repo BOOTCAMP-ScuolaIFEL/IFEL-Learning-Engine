@@ -1,0 +1,846 @@
+<div id="ifel-learning-engine"></div>
+
+<style>
+#ifel-learning-engine {
+  font-family: Arial, sans-serif;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px;
+  background: linear-gradient(180deg, #FAFCFE 0%, #F3F7FA 100%);
+  border-radius: 28px;
+  color: #102A43;
+}
+
+.ifel-header {
+  text-align: center;
+  border-top: 3px solid var(--primary, #0097B2);
+  padding-top: 22px;
+  margin-bottom: 8px;
+}
+
+.ifel-header h2 {
+  margin: 0;
+  font-size: 38px;
+  line-height: 1.15;
+  color: var(--primary, #0097B2);
+  letter-spacing: -0.03em;
+}
+
+.ifel-header p {
+  font-size: 18px;
+  color: var(--text, #102A43);
+  max-width: 760px;
+  margin: 12px auto 0;
+  line-height: 1.55;
+}
+
+.ifel-progress-wrap {
+  margin: 26px 0;
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(16, 42, 67, 0.06);
+  box-shadow: 0 8px 24px rgba(16, 42, 67, 0.05);
+}
+
+.ifel-progress-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  margin-bottom: 10px;
+  color: var(--text, #102a43);
+  font-weight: 700;
+}
+
+.ifel-progress {
+  width: 100%;
+  height: 12px;
+  background: #e5edf2;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.ifel-progress-bar {
+  height: 100%;
+  background: var(--primary, #0097B2);
+  width: 0%;
+  transition: width 0.3s ease;
+}
+
+.ifel-nav {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 28px 0;
+}
+
+.ifel-year {
+  border: 2px solid var(--primary, #0097B2);
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--primary, #0097B2);
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(16, 42, 67, 0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.ifel-year:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(16, 42, 67, 0.10);
+}
+
+.ifel-year.active {
+  background: var(--primary, #0097B2);
+  color: white;
+}
+
+.ifel-card {
+  display: grid;
+  grid-template-columns: 36% 64%;
+  gap: 30px;
+  padding: 30px;
+  border-radius: 28px;
+  background: #FFFFFF;
+  box-shadow:
+    0 18px 45px rgba(16, 42, 67, 0.12),
+    0 4px 12px rgba(16, 42, 67, 0.06);
+  border: 1px solid rgba(16, 42, 67, 0.08);
+}
+
+.ifel-media {
+  position: sticky;
+  top: 18px;
+  align-self: start;
+}
+
+.ifel-media img {
+  width: 100%;
+  border-radius: 22px;
+  object-fit: cover;
+  max-height: 420px;
+  box-shadow: 0 12px 30px rgba(16, 42, 67, 0.12);
+  border: 1px solid rgba(16, 42, 67, 0.08);
+}
+
+.ifel-badge {
+  display: inline-block;
+  background: var(--primary, #0097B2);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.ifel-main h3 {
+  font-size: 32px;
+  line-height: 1.15;
+  margin: 16px 0 8px;
+  letter-spacing: -0.03em;
+  color: #102A43;
+}
+
+.ifel-subtitle {
+  font-size: 18px;
+  color: var(--text, #102a43);
+  margin-bottom: 22px;
+  line-height: 1.6;
+}
+
+.ifel-block {
+  margin: 16px 0;
+  padding: 20px;
+  border-radius: 20px;
+  background: #FBFCFD;
+  line-height: 1.55;
+  box-shadow: 0 6px 18px rgba(16, 42, 67, 0.06);
+  border: 1px solid rgba(16, 42, 67, 0.06);
+}
+
+.ifel-block h4 {
+  margin: 0 0 8px;
+  color: var(--primary, #0097B2);
+  font-size: 18px;
+}
+
+.ifel-block p {
+  margin: 8px 0 0;
+}
+
+.ifel-podcast {
+  background: var(--secondary, #EAF8FB);
+}
+
+.ifel-podcast audio {
+  width: 100%;
+  margin-top: 14px;
+}
+
+.ifel-video {
+  background: var(--secondary, #EAF8FB);
+}
+
+.ifel-video-frame {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  overflow: hidden;
+  border-radius: 16px;
+  margin-top: 14px;
+  box-shadow: 0 10px 26px rgba(16, 42, 67, 0.10);
+}
+
+.ifel-video-frame iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.ifel-video video {
+  width: 100%;
+  border-radius: 16px;
+  margin-top: 14px;
+}
+
+.ifel-quote {
+  background: #fff8e6;
+  border-left: 6px solid var(--accent, #0097B2);
+  font-style: italic;
+}
+
+.ifel-quote strong {
+  color: var(--primary, #0097B2);
+}
+
+.ifel-document a {
+  display: inline-block;
+  margin-top: 12px;
+  background: var(--button, #0097B2);
+  color: var(--button-text, #ffffff);
+  padding: 11px 18px;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 800;
+  box-shadow: 0 8px 18px rgba(16, 42, 67, 0.10);
+}
+
+.ifel-compare {
+  background: var(--secondary, #eefafd);
+}
+
+.ifel-compare-wrap {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 18px;
+  margin-top: 14px;
+  user-select: none;
+  box-shadow: 0 12px 30px rgba(16, 42, 67, 0.12);
+  border: 1px solid rgba(16, 42, 67, 0.08);
+}
+
+.ifel-compare-wrap img {
+  display: block;
+  width: 100%;
+}
+
+.ifel-compare-after {
+  position: absolute;
+  inset: 0;
+  width: 50%;
+  overflow: hidden;
+  border-right: 3px solid var(--primary, #0097B2);
+}
+
+.ifel-compare-after img {
+  height: 100%;
+  width: auto;
+  max-width: none;
+}
+
+.ifel-compare-slider {
+  width: 100%;
+  margin-top: 14px;
+  accent-color: var(--primary, #0097B2);
+}
+
+.ifel-compare-labels {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 800;
+  color: var(--primary, #0097B2);
+  margin-top: 8px;
+}
+
+.ifel-chapter-footer {
+  margin-top: 32px;
+  padding: 34px 26px;
+  border-radius: 28px;
+  text-align: center;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.96), rgba(250,252,254,0.96));
+  border: 1px solid rgba(16, 42, 67, 0.08);
+  box-shadow:
+    0 18px 45px rgba(16, 42, 67, 0.10),
+    0 4px 12px rgba(16, 42, 67, 0.05);
+}
+
+.ifel-footer-kicker {
+  display: inline-block;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--primary, #0097B2);
+  background: var(--secondary, #EAF8FB);
+  padding: 8px 14px;
+  border-radius: 999px;
+  margin-bottom: 18px;
+}
+
+.ifel-footer-next-year {
+  font-size: 64px;
+  line-height: 1;
+  font-weight: 900;
+  letter-spacing: -0.06em;
+  color: var(--primary, #0097B2);
+  margin-bottom: 8px;
+}
+
+.ifel-footer-next-title {
+  font-size: 24px;
+  line-height: 1.25;
+  font-weight: 800;
+  color: #102A43;
+  margin-bottom: 24px;
+}
+
+.ifel-footer-button {
+  border: none;
+  background: var(--button, #0097B2);
+  color: var(--button-text, #ffffff);
+  width: min(360px, 100%);
+  padding: 17px 26px;
+  border-radius: 999px;
+  font-size: 16px;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 12px 26px rgba(16, 42, 67, 0.14);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ifel-footer-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 16px 32px rgba(16, 42, 67, 0.18);
+}
+
+.ifel-completion {
+  margin-top: 22px;
+  padding: 20px;
+  border-radius: 20px;
+  background: var(--secondary, #EAF8FB);
+  border-left: 6px solid var(--primary, #0097B2);
+  box-shadow: 0 8px 20px rgba(16, 42, 67, 0.08);
+}
+
+.ifel-loading,
+.ifel-error {
+  text-align: center;
+  padding: 30px;
+  border-radius: 20px;
+  background: #ffffff;
+}
+
+@media (max-width: 800px) {
+  #ifel-learning-engine {
+    padding: 24px;
+    border-radius: 22px;
+  }
+
+  .ifel-header h2 {
+    font-size: 30px;
+  }
+
+  .ifel-card {
+    grid-template-columns: 1fr;
+    padding: 22px;
+  }
+
+  .ifel-media {
+    position: static;
+  }
+
+  .ifel-footer-next-year {
+    font-size: 52px;
+  }
+
+  .ifel-footer-next-title {
+    font-size: 21px;
+  }
+}
+</style>
+
+<script>
+const URLS = {
+  timeline: "https://docs.google.com/spreadsheets/d/e/2PACX-1vS17cWdNg48ztlG3-UJhymVJb7uMJ7Y_x4gRxpv-e3HfBE1i9nSHXp43-qWE3596NR5mb0zVSBq1u2x/pub?gid=0&single=true&output=csv",
+  theme: "https://docs.google.com/spreadsheets/d/e/2PACX-1vS17cWdNg48ztlG3-UJhymVJb7uMJ7Y_x4gRxpv-e3HfBE1i9nSHXp43-qWE3596NR5mb0zVSBq1u2x/pub?gid=340631276&single=true&output=csv",
+  settings: "https://docs.google.com/spreadsheets/d/e/2PACX-1vS17cWdNg48ztlG3-UJhymVJb7uMJ7Y_x4gRxpv-e3HfBE1i9nSHXp43-qWE3596NR5mb0zVSBq1u2x/pub?gid=1536316311&single=true&output=csv",
+  components: "https://docs.google.com/spreadsheets/d/e/2PACX-1vS17cWdNg48ztlG3-UJhymVJb7uMJ7Y_x4gRxpv-e3HfBE1i9nSHXp43-qWE3596NR5mb0zVSBq1u2x/pub?gid=1443385049&single=true&output=csv"
+};
+
+let ifelData = [];
+let themes = {};
+let settings = {};
+let components = {};
+let currentStep = 0;
+
+function parseCSV(text) {
+  const rows = [];
+  let row = [];
+  let cell = "";
+  let insideQuotes = false;
+
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    const next = text[i + 1];
+
+    if (char === '"' && insideQuotes && next === '"') {
+      cell += '"';
+      i++;
+    } else if (char === '"') {
+      insideQuotes = !insideQuotes;
+    } else if (char === "," && !insideQuotes) {
+      row.push(cell);
+      cell = "";
+    } else if ((char === "\n" || char === "\r") && !insideQuotes) {
+      if (cell || row.length) {
+        row.push(cell);
+        rows.push(row);
+        row = [];
+        cell = "";
+      }
+      if (char === "\r" && next === "\n") i++;
+    } else {
+      cell += char;
+    }
+  }
+
+  if (cell || row.length) {
+    row.push(cell);
+    rows.push(row);
+  }
+
+  return rows;
+}
+
+function rowsToObjects(rows) {
+  const headers = rows[0].map(h => h.trim().toLowerCase());
+
+  return rows.slice(1).map(row => {
+    const obj = {};
+    headers.forEach((h, i) => {
+      obj[h] = row[i] ? row[i].trim() : "";
+    });
+    return obj;
+  });
+}
+
+function fetchCSV(url) {
+  return fetch(url)
+    .then(response => response.text())
+    .then(csv => rowsToObjects(parseCSV(csv)));
+}
+
+function normalizeBool(value, defaultValue) {
+  if (!value) return defaultValue;
+  return String(value).trim().toUpperCase() !== "FALSE";
+}
+
+function loadSettings(items) {
+  const result = {};
+  items.forEach(item => {
+    if (item.chiave) result[item.chiave] = item.valore || "";
+  });
+  return result;
+}
+
+function loadThemes(items) {
+  const result = {};
+  items.forEach(item => {
+    if (item.tema) result[item.tema] = item;
+  });
+  return result;
+}
+
+function loadComponents(items) {
+  const result = {};
+  items.forEach(item => {
+    if (item.blocco) result[item.blocco] = item;
+  });
+  return result;
+}
+
+function groupByYear(items) {
+  const visibleItems = items.filter(item => {
+    if (!item.anno || !item.blocco) return false;
+    return normalizeBool(item.visibile, true);
+  });
+
+  const grouped = {};
+
+  visibleItems.forEach(item => {
+    if (!grouped[item.anno]) grouped[item.anno] = [];
+    grouped[item.anno].push(item);
+  });
+
+  return Object.keys(grouped).map(year => ({
+    year,
+    blocks: grouped[year].sort((a, b) => Number(a.ordine) - Number(b.ordine))
+  }));
+}
+
+function getStepTheme(step) {
+  const hero = step.blocks.find(b => b.blocco === "hero");
+  const themeName = hero && hero.tema ? hero.tema : settings.theme_default || "ifel";
+  return themes[themeName] || themes.ifel || {};
+}
+
+function applyTheme(theme) {
+  const root = document.getElementById("ifel-learning-engine");
+
+  root.style.setProperty("--primary", theme.primary || "#0097B2");
+  root.style.setProperty("--secondary", theme.secondary || "#EAF8FB");
+  root.style.setProperty("--background", theme.background || "#FFFFFF");
+  root.style.setProperty("--text", theme.text || "#102A43");
+  root.style.setProperty("--accent", theme.accent || "#00738A");
+  root.style.setProperty("--button", theme.button || theme.primary || "#0097B2");
+  root.style.setProperty("--button-text", theme.button_text || "#FFFFFF");
+}
+
+function getIcon(blockName, fallback) {
+  return components[blockName] && components[blockName].icona
+    ? components[blockName].icona
+    : fallback;
+}
+
+function renderProgress() {
+  if (!normalizeBool(settings.show_progress, true)) return "";
+
+  const total = ifelData.length;
+  const current = currentStep + 1;
+  const percent = Math.round((current / total) * 100);
+
+  return `
+    <div class="ifel-progress-wrap">
+      <div class="ifel-progress-info">
+        <span>Tappa ${current} di ${total}</span>
+        <span>${percent}%</span>
+      </div>
+      <div class="ifel-progress">
+        <div class="ifel-progress-bar" style="width:${percent}%"></div>
+      </div>
+    </div>
+  `;
+}
+
+function renderNavigation() {
+  if (!normalizeBool(settings.show_navigation, true)) return "";
+
+  return `
+    <div class="ifel-nav">
+      ${ifelData.map((step, index) => `
+        <button class="ifel-year ${index === currentStep ? "active" : ""}" onclick="renderStep(${index})">
+          ${step.year}
+        </button>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderHero(block) {
+  return `
+    <div class="ifel-badge">${block.anno}</div>
+    <h3>${block.titolo}</h3>
+    <p class="ifel-subtitle">${block.contenuto}</p>
+  `;
+}
+
+function renderText(block) {
+  return `
+    <div class="ifel-block">
+      <h4>${getIcon("text", "📘")} ${block.titolo}</h4>
+      <p>${block.contenuto}</p>
+    </div>
+  `;
+}
+
+function renderPodcast(block) {
+  return `
+    <div class="ifel-block ifel-podcast">
+      <h4>${getIcon("podcast", "🎙")} ${block.titolo}</h4>
+      <p>${block.contenuto}</p>
+      ${block.url ? `
+        <audio controls preload="metadata">
+          <source src="${block.url}" type="audio/mpeg">
+          Il tuo browser non supporta l'audio.
+        </audio>
+      ` : `<p><em>Inserisci un URL audio nella colonna url.</em></p>`}
+    </div>
+  `;
+}
+
+function getVideoEmbedUrl(url) {
+  if (!url) return "";
+
+  if (url.includes("youtube.com/watch?v=")) {
+    return url.replace("watch?v=", "embed/");
+  }
+
+  if (url.includes("youtu.be/")) {
+    const id = url.split("youtu.be/")[1].split("?")[0];
+    return "https://www.youtube.com/embed/" + id;
+  }
+
+  if (url.includes("vimeo.com/")) {
+    const id = url.split("vimeo.com/")[1].split("?")[0];
+    return "https://player.vimeo.com/video/" + id;
+  }
+
+  return url;
+}
+
+function renderVideo(block) {
+  const videoUrl = getVideoEmbedUrl(block.url);
+
+  if (!videoUrl) {
+    return `
+      <div class="ifel-block ifel-video">
+        <h4>${getIcon("video", "🎥")} ${block.titolo}</h4>
+        <p>${block.contenuto}</p>
+        <p><em>Inserisci un URL video nella colonna url.</em></p>
+      </div>
+    `;
+  }
+
+  if (videoUrl.endsWith(".mp4")) {
+    return `
+      <div class="ifel-block ifel-video">
+        <h4>${getIcon("video", "🎥")} ${block.titolo}</h4>
+        <p>${block.contenuto}</p>
+        <video controls>
+          <source src="${videoUrl}" type="video/mp4">
+          Il tuo browser non supporta il video.
+        </video>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="ifel-block ifel-video">
+      <h4>${getIcon("video", "🎥")} ${block.titolo}</h4>
+      <p>${block.contenuto}</p>
+      <div class="ifel-video-frame">
+        <iframe src="${videoUrl}" allowfullscreen></iframe>
+      </div>
+    </div>
+  `;
+}
+
+function renderCompare(block) {
+  if (!block.before_url || !block.after_url) {
+    return `
+      <div class="ifel-block ifel-compare">
+        <h4>🔄 ${block.titolo}</h4>
+        <p>${block.contenuto}</p>
+        <p><em>Inserisci before_url e after_url nel Google Sheet.</em></p>
+      </div>
+    `;
+  }
+
+  const compareId = "compare-" + Math.random().toString(36).substring(2, 9);
+
+  setTimeout(() => {
+    const slider = document.getElementById(compareId + "-slider");
+    const after = document.getElementById(compareId + "-after");
+
+    if (slider && after) {
+      slider.addEventListener("input", function () {
+        after.style.width = this.value + "%";
+      });
+    }
+  }, 100);
+
+  return `
+    <div class="ifel-block ifel-compare">
+      <h4>🔄 ${block.titolo}</h4>
+      <p>${block.contenuto}</p>
+
+      <div class="ifel-compare-wrap">
+        <img src="${block.before_url}" alt="Prima">
+        <div class="ifel-compare-after" id="${compareId}-after">
+          <img src="${block.after_url}" alt="Dopo">
+        </div>
+      </div>
+
+      <input id="${compareId}-slider" class="ifel-compare-slider" type="range" min="0" max="100" value="50">
+
+      <div class="ifel-compare-labels">
+        <span>Prima</span>
+        <span>Dopo</span>
+      </div>
+    </div>
+  `;
+}
+
+function renderQuote(block) {
+  return `
+    <div class="ifel-block ifel-quote">
+      <strong>${getIcon("quote", "💬")} ${block.titolo}</strong>
+      <p>${block.contenuto}</p>
+    </div>
+  `;
+}
+
+function renderDocument(block) {
+  return `
+    <div class="ifel-block ifel-document">
+      <h4>${getIcon("document", "📄")} ${block.titolo}</h4>
+      <p>${block.contenuto}</p>
+      ${block.url ? `<a href="${block.url}" target="_blank">Apri documento</a>` : ""}
+    </div>
+  `;
+}
+
+function renderBlock(block) {
+  switch (block.blocco) {
+    case "hero":
+      return renderHero(block);
+    case "text":
+      return renderText(block);
+    case "podcast":
+      return renderPodcast(block);
+    case "video":
+      return renderVideo(block);
+    case "compare":
+      return renderCompare(block);
+    case "quote":
+      return renderQuote(block);
+    case "document":
+      return renderDocument(block);
+    case "image":
+      return "";
+    default:
+      return "";
+  }
+}
+
+function getHeroTitle(step) {
+  const hero = step.blocks.find(b => b.blocco === "hero");
+  return hero && hero.titolo ? hero.titolo : "";
+}
+
+function renderCompletion() {
+  if (!normalizeBool(settings.show_completion, true)) return "";
+  if (currentStep !== ifelData.length - 1) return "";
+
+  return `
+    <div class="ifel-completion">
+      <strong>✔ Hai completato il percorso</strong>
+      <p>Hai esplorato tutte le tappe di questa timeline.</p>
+    </div>
+  `;
+}
+
+function renderChapterFooter() {
+  const isLast = currentStep === ifelData.length - 1;
+  const nextIndex = isLast ? 0 : currentStep + 1;
+  const nextStep = ifelData[nextIndex];
+  const nextYear = nextStep.year;
+  const nextTitle = getHeroTitle(nextStep);
+  const buttonText = isLast ? "RICOMINCIA IL PERCORSO ↺" : "CONTINUA →";
+  const kicker = isLast ? "Percorso completato" : "Prossima tappa";
+
+  return `
+    <div class="ifel-chapter-footer">
+      <div class="ifel-footer-kicker">✓ ${kicker}</div>
+      <div class="ifel-footer-next-year">${nextYear}</div>
+      <div class="ifel-footer-next-title">${nextTitle}</div>
+      <button class="ifel-footer-button" onclick="renderStep(${nextIndex})">${buttonText}</button>
+    </div>
+  `;
+}
+
+function renderStep(index) {
+  currentStep = index;
+  const step = ifelData[index];
+  const theme = getStepTheme(step);
+  applyTheme(theme);
+
+  const imageBlock = step.blocks.find(b => b.blocco === "image");
+  const contentBlocks = step.blocks.map(renderBlock).join("");
+
+  document.getElementById("ifel-learning-engine").innerHTML = `
+    <div class="ifel-header">
+      <h2>${settings.course_title || "Macchina del tempo"}</h2>
+      <p>${settings.subtitle || "Scorri le tappe e scopri come cambia il contesto nel tempo."}</p>
+    </div>
+
+    ${renderProgress()}
+    ${renderNavigation()}
+
+    <div class="ifel-card">
+      <div class="ifel-media">
+        ${imageBlock && imageBlock.url ? `<img src="${imageBlock.url}" alt="${imageBlock.titolo || ""}">` : ""}
+      </div>
+
+      <div class="ifel-main">
+        ${contentBlocks}
+        ${renderCompletion()}
+        ${renderChapterFooter()}
+      </div>
+    </div>
+  `;
+}
+
+function nextStep() {
+  const next = currentStep < ifelData.length - 1 ? currentStep + 1 : 0;
+  renderStep(next);
+}
+
+function prevStep() {
+  const prev = currentStep > 0 ? currentStep - 1 : ifelData.length - 1;
+  renderStep(prev);
+}
+
+document.getElementById("ifel-learning-engine").innerHTML =
+  `<div class="ifel-loading">Caricamento contenuti...</div>`;
+
+Promise.all([
+  fetchCSV(URLS.timeline),
+  fetchCSV(URLS.theme),
+  fetchCSV(URLS.settings),
+  fetchCSV(URLS.components)
+])
+.then(([timelineRows, themeRows, settingsRows, componentsRows]) => {
+  settings = loadSettings(settingsRows);
+  themes = loadThemes(themeRows);
+  components = loadComponents(componentsRows);
+  ifelData = groupByYear(timelineRows);
+
+  if (!ifelData.length) {
+    document.getElementById("ifel-learning-engine").innerHTML =
+      `<div class="ifel-error">Nessun contenuto trovato. Controlla il foglio Timeline.</div>`;
+    return;
+  }
+
+  renderStep(0);
+})
+.catch(error => {
+  document.getElementById("ifel-learning-engine").innerHTML =
+    `<div class="ifel-error">Non riesco a caricare i dati dai Google Sheet. Controlla che tutti i fogli siano pubblicati in formato CSV.</div>`;
+  console.error(error);
+});
+</script>

@@ -2,6 +2,7 @@
 
 <style>
 #ifel-learning-engine {
+  position: relative;
   font-family: Arial, sans-serif;
   max-width: 1100px;
   margin: 0 auto;
@@ -74,6 +75,66 @@
   background: var(--primary, #0097B2);
   width: 0%;
   transition: width 0.3s ease;
+}
+
+.ifel-card.ifel-stage-content-leaving .ifel-media,
+.ifel-card.ifel-stage-content-leaving .ifel-main > .ifel-badge,
+.ifel-card.ifel-stage-content-leaving .ifel-main > h3,
+.ifel-card.ifel-stage-content-leaving .ifel-main > .ifel-subtitle,
+.ifel-card.ifel-stage-content-leaving .ifel-main .ifel-block,
+.ifel-card.ifel-stage-content-leaving .ifel-completion {
+  opacity: 0;
+  transform: translateY(8px) scale(0.995);
+  transition: opacity 280ms ease-out, transform 280ms ease-out;
+  transition-delay: 0ms;
+}
+
+.ifel-time-machine {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  border-radius: 28px;
+  background:
+    linear-gradient(180deg, rgba(250, 252, 254, 0.94), rgba(242, 248, 253, 0.96));
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(8px) scale(0.985);
+  transition: opacity 260ms ease-out, transform 260ms ease-out;
+}
+
+.ifel-time-machine.ifel-time-machine-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.ifel-time-machine.ifel-time-machine-focus {
+  transform: translateY(0) scale(1.02);
+}
+
+.ifel-time-machine.ifel-time-machine-exit {
+  opacity: 0;
+  transform: translateY(-8px) scale(0.92);
+  transition: opacity 260ms ease-in-out, transform 260ms ease-in-out;
+}
+
+.ifel-time-machine-year {
+  color: var(--primary, #0097B2);
+  font-size: clamp(64px, 14vw, 156px);
+  line-height: 1;
+  font-weight: 900;
+  letter-spacing: 0;
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition: opacity 220ms ease-in-out, transform 220ms ease-in-out;
+}
+
+.ifel-time-machine-year.ifel-time-machine-year-changing {
+  opacity: 0;
+  transform: translateY(8px) scale(0.98);
 }
 
 .ifel-nav {
@@ -462,7 +523,9 @@
   .ifel-card .ifel-main > h3,
   .ifel-card .ifel-main > .ifel-subtitle,
   .ifel-main .ifel-block,
-  .ifel-image-current {
+  .ifel-image-current,
+  .ifel-time-machine,
+  .ifel-time-machine-year {
     opacity: 1;
     transform: none;
     transition: none;
@@ -490,6 +553,7 @@ let components = {};
 let currentStep = 0;
 let currentImageUrl = "";
 let renderStepRequest = 0;
+let isStageTransitioning = false;
 const imagePreloadCache = {};
 
 function parseCSV(text) {
@@ -647,7 +711,7 @@ function renderNavigation() {
   return `
     <div class="ifel-nav">
       ${ifelData.map((step, index) => `
-        <button class="ifel-year ${index === currentStep ? "active" : ""}" onclick="renderStep(${index})">
+        <button class="ifel-year ${index === currentStep ? "active" : ""}" onclick="goToStep(${index})">
           ${step.year}
         </button>
       `).join("")}
@@ -910,7 +974,7 @@ function renderChapterFooter() {
     return `
       <div class="ifel-chapter-footer">
         <div class="ifel-footer-status">Percorso completato</div>
-        <button class="ifel-footer-button" onclick="renderStep(0)">Ricomincia il percorso</button>
+        <button class="ifel-footer-button" onclick="goToStep(0)">Ricomincia il percorso</button>
       </div>
     `;
   }
@@ -923,9 +987,99 @@ function renderChapterFooter() {
       <div class="ifel-footer-kicker">Prossima tappa</div>
       <div class="ifel-footer-next-year">${nextStep.year}</div>
       <div class="ifel-footer-next-title">${nextTitle}</div>
-      <button class="ifel-footer-button" onclick="renderStep(${nextIndex})">Continua</button>
+      <button class="ifel-footer-button" onclick="goToStep(${nextIndex})">Continua</button>
     </div>
   `;
+}
+
+function prefersReducedMotion() {
+  return window.matchMedia &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+function wait(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function renderTimeMachineLayer(fromYear) {
+  return `
+    <div class="ifel-time-machine" aria-hidden="true">
+      <div class="ifel-time-machine-year">${fromYear}</div>
+    </div>
+  `;
+}
+
+async function runTimeMachineTransition(destinationIndex) {
+  if (isStageTransitioning) return;
+  if (destinationIndex === currentStep) return;
+  if (!ifelData[destinationIndex]) return;
+
+  if (prefersReducedMotion()) {
+    await renderStep(destinationIndex);
+    return;
+  }
+
+  isStageTransitioning = true;
+
+  const root = document.getElementById("ifel-learning-engine");
+  const currentYear = ifelData[currentStep] ? ifelData[currentStep].year : "";
+  const destinationYear = ifelData[destinationIndex].year;
+  const destinationImageReady = preloadImage(getStepImageUrl(ifelData[destinationIndex]));
+  const currentCard = root.querySelector(".ifel-card");
+
+  if (currentCard) {
+    currentCard.classList.add("ifel-stage-content-leaving");
+  }
+
+  await wait(280);
+
+  root.insertAdjacentHTML("beforeend", renderTimeMachineLayer(currentYear));
+
+  const layer = root.querySelector(".ifel-time-machine");
+  const yearLabel = layer ? layer.querySelector(".ifel-time-machine-year") : null;
+
+  requestAnimationFrame(() => {
+    if (layer) {
+      layer.classList.add("ifel-time-machine-visible");
+    }
+  });
+
+  await wait(250);
+
+  if (yearLabel) {
+    yearLabel.classList.add("ifel-time-machine-year-changing");
+  }
+
+  await wait(120);
+
+  if (yearLabel) {
+    yearLabel.textContent = destinationYear;
+    yearLabel.classList.remove("ifel-time-machine-year-changing");
+  }
+
+  if (layer) {
+    layer.classList.add("ifel-time-machine-focus");
+  }
+
+  await wait(260);
+  await destinationImageReady;
+
+  if (layer) {
+    layer.classList.add("ifel-time-machine-exit");
+  }
+
+  await wait(220);
+
+  if (layer) {
+    layer.remove();
+  }
+
+  await renderStep(destinationIndex);
+  isStageTransitioning = false;
+}
+
+function goToStep(index) {
+  runTimeMachineTransition(index);
 }
 
 async function renderStep(index) {
@@ -946,24 +1100,26 @@ async function renderStep(index) {
   const editorialImage = renderEditorialImage(imageBlock, previousImageUrl, nextImageUrl);
 
   document.getElementById("ifel-learning-engine").innerHTML = `
-    <div class="ifel-header">
-      <h2>${settings.course_title || "Macchina del tempo"}</h2>
-      <p>${settings.subtitle || "Scorri le tappe e scopri come cambia il contesto nel tempo."}</p>
-      ${renderHeroIntro()}
-    </div>
-
-    ${renderProgress()}
-    ${renderNavigation()}
-
-    <div class="ifel-card">
-      <div class="ifel-media">
-        ${editorialImage}
+    <div class="ifel-stage-shell">
+      <div class="ifel-header">
+        <h2>${settings.course_title || "Macchina del tempo"}</h2>
+        <p>${settings.subtitle || "Scorri le tappe e scopri come cambia il contesto nel tempo."}</p>
+        ${renderHeroIntro()}
       </div>
 
-      <div class="ifel-main">
-        ${contentBlocks}
-        ${renderCompletion()}
-        ${renderChapterFooter()}
+      ${renderProgress()}
+      ${renderNavigation()}
+
+      <div class="ifel-card">
+        <div class="ifel-media">
+          ${editorialImage}
+        </div>
+
+        <div class="ifel-main">
+          ${contentBlocks}
+          ${renderCompletion()}
+          ${renderChapterFooter()}
+        </div>
       </div>
     </div>
   `;
@@ -1009,12 +1165,12 @@ async function renderStep(index) {
 
 function nextStep() {
   const next = currentStep < ifelData.length - 1 ? currentStep + 1 : 0;
-  renderStep(next);
+  goToStep(next);
 }
 
 function prevStep() {
   const prev = currentStep > 0 ? currentStep - 1 : ifelData.length - 1;
-  renderStep(prev);
+  goToStep(prev);
 }
 
 document.getElementById("ifel-learning-engine").innerHTML =

@@ -141,6 +141,7 @@
   margin: 16px 0 8px;
   letter-spacing: -0.03em;
   color: #102A43;
+  text-align: center;
 }
 
 .ifel-subtitle {
@@ -279,7 +280,7 @@
 
 .ifel-chapter-footer {
   margin-top: 32px;
-  padding: 34px 26px;
+  padding: 40px 28px;
   border-radius: 28px;
   text-align: center;
   background:
@@ -290,42 +291,50 @@
     0 4px 12px rgba(16, 42, 67, 0.05);
 }
 
-.ifel-footer-kicker {
-  display: inline-block;
-  font-size: 14px;
+.ifel-footer-status {
+  font-size: 32px;
+  line-height: 1.2;
   font-weight: 800;
   color: var(--primary, #0097B2);
-  background: var(--secondary, #EAF8FB);
-  padding: 8px 14px;
-  border-radius: 999px;
-  margin-bottom: 18px;
+  margin-bottom: 24px;
+}
+
+.ifel-footer-kicker {
+  font-size: 14px;
+  line-height: 1.35;
+  font-weight: 800;
+  color: var(--primary, #0097B2);
+  margin-bottom: 6px;
+  text-align: center;
 }
 
 .ifel-footer-next-year {
-  font-size: 64px;
-  line-height: 1;
-  font-weight: 900;
-  letter-spacing: -0.06em;
+  font-size: 14px;
+  line-height: 1.35;
+  font-weight: 800;
+  letter-spacing: 0;
   color: var(--primary, #0097B2);
-  margin-bottom: 8px;
+  margin-bottom: 6px;
+  text-align: center;
 }
 
 .ifel-footer-next-title {
-  font-size: 24px;
-  line-height: 1.25;
+  font-size: 14px;
+  line-height: 1.35;
   font-weight: 800;
   color: #102A43;
-  margin-bottom: 24px;
+  margin-bottom: 30px;
+  text-align: center;
 }
 
 .ifel-footer-button {
   border: none;
   background: var(--button, #0097B2);
   color: var(--button-text, #ffffff);
-  width: min(360px, 100%);
-  padding: 17px 26px;
+  width: min(440px, 100%);
+  padding: 21px 30px;
   border-radius: 999px;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 900;
   cursor: pointer;
   box-shadow: 0 12px 26px rgba(16, 42, 67, 0.14);
@@ -374,11 +383,11 @@
   }
 
   .ifel-footer-next-year {
-    font-size: 52px;
+    font-size: 14px;
   }
 
   .ifel-footer-next-title {
-    font-size: 21px;
+    font-size: 14px;
   }
 }
 </style>
@@ -757,18 +766,25 @@ function renderCompletion() {
 function renderChapterFooter() {
   const isLast = currentStep === ifelData.length - 1;
   const nextIndex = isLast ? 0 : currentStep + 1;
+
+  if (isLast) {
+    return `
+      <div class="ifel-chapter-footer">
+        <div class="ifel-footer-status">Percorso completato</div>
+        <button class="ifel-footer-button" onclick="renderStep(0)">Ricomincia il percorso</button>
+      </div>
+    `;
+  }
+
   const nextStep = ifelData[nextIndex];
-  const nextYear = nextStep.year;
   const nextTitle = getHeroTitle(nextStep);
-  const buttonText = isLast ? "RICOMINCIA IL PERCORSO ↺" : "CONTINUA →";
-  const kicker = isLast ? "Percorso completato" : "Prossima tappa";
 
   return `
     <div class="ifel-chapter-footer">
-      <div class="ifel-footer-kicker">✓ ${kicker}</div>
-      <div class="ifel-footer-next-year">${nextYear}</div>
+      <div class="ifel-footer-kicker">Prossima tappa</div>
+      <div class="ifel-footer-next-year">${nextStep.year}</div>
       <div class="ifel-footer-next-title">${nextTitle}</div>
-      <button class="ifel-footer-button" onclick="renderStep(${nextIndex})">${buttonText}</button>
+      <button class="ifel-footer-button" onclick="renderStep(${nextIndex})">Continua</button>
     </div>
   `;
 }

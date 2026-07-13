@@ -34,6 +34,15 @@
   line-height: 1.55;
 }
 
+.ifel-hero-intro {
+  max-width: 850px;
+  margin: 18px auto 0;
+  text-align: center;
+  font-size: 16px;
+  line-height: 1.65;
+  color: var(--text, #102A43);
+}
+
 .ifel-progress-wrap {
   margin: 26px 0;
   padding: 16px 18px;
@@ -646,6 +655,14 @@ function renderNavigation() {
   `;
 }
 
+function renderHeroIntro() {
+  if (!settings.hero_intro) return "";
+
+  return `
+    <div class="ifel-hero-intro">${settings.hero_intro}</div>
+  `;
+}
+
 function renderHero(block) {
   return `
     <div class="ifel-badge">${block.anno}</div>
@@ -932,6 +949,7 @@ async function renderStep(index) {
     <div class="ifel-header">
       <h2>${settings.course_title || "Macchina del tempo"}</h2>
       <p>${settings.subtitle || "Scorri le tappe e scopri come cambia il contesto nel tempo."}</p>
+      ${renderHeroIntro()}
     </div>
 
     ${renderProgress()}

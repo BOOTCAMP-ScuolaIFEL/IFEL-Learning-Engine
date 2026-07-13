@@ -125,6 +125,23 @@
   border: 1px solid rgba(16, 42, 67, 0.08);
 }
 
+.ifel-card .ifel-main {
+  animation: ifel-stage-content-in 280ms ease-out both;
+  will-change: opacity, transform;
+}
+
+@keyframes ifel-stage-content-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .ifel-badge {
   display: inline-block;
   background: var(--primary, #0097B2);
@@ -284,7 +301,7 @@
   border-radius: 28px;
   text-align: center;
   background:
-    linear-gradient(180deg, rgba(255,255,255,0.96), rgba(250,252,254,0.96));
+    linear-gradient(180deg, rgba(248,252,255,0.98), rgba(242,248,253,0.98));
   border: 1px solid rgba(16, 42, 67, 0.08);
   box-shadow:
     0 18px 45px rgba(16, 42, 67, 0.10),
@@ -388,6 +405,13 @@
 
   .ifel-footer-next-title {
     font-size: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ifel-card .ifel-main {
+    animation: none;
+    will-change: auto;
   }
 }
 </style>
@@ -549,7 +573,7 @@ function renderProgress() {
         <span>${percent}%</span>
       </div>
       <div class="ifel-progress">
-        <div class="ifel-progress-bar" style="width:${percent}%"></div>
+        <div class="ifel-progress-bar" data-progress="${percent}" style="width:0%"></div>
       </div>
     </div>
   `;
@@ -819,6 +843,14 @@ function renderStep(index) {
       </div>
     </div>
   `;
+
+  const progressBar = document.querySelector("#ifel-learning-engine .ifel-progress-bar");
+  if (progressBar) {
+    const progressValue = progressBar.dataset.progress || "0";
+    requestAnimationFrame(() => {
+      progressBar.style.width = progressValue + "%";
+    });
+  }
 }
 
 function nextStep() {

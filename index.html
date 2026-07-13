@@ -125,21 +125,33 @@
   border: 1px solid rgba(16, 42, 67, 0.08);
 }
 
-.ifel-card .ifel-main {
-  animation: ifel-stage-content-in 280ms ease-out both;
+.ifel-card .ifel-main > .ifel-badge,
+.ifel-card .ifel-main > h3,
+.ifel-card .ifel-main > .ifel-subtitle {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 280ms ease-out, transform 280ms ease-out;
   will-change: opacity, transform;
 }
 
-@keyframes ifel-stage-content-in {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
+.ifel-card .ifel-main.ifel-stage-visible > .ifel-badge,
+.ifel-card .ifel-main.ifel-stage-visible > h3,
+.ifel-card .ifel-main.ifel-stage-visible > .ifel-subtitle {
+  opacity: 1;
+  transform: translateY(0);
+}
 
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.ifel-main .ifel-block {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 300ms ease-out, transform 300ms ease-out;
+  transition-delay: var(--ifel-stagger-delay, 0ms);
+  will-change: opacity, transform;
+}
+
+.ifel-main .ifel-block.ifel-block-visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .ifel-badge {
@@ -409,8 +421,13 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ifel-card .ifel-main {
-    animation: none;
+  .ifel-card .ifel-main > .ifel-badge,
+  .ifel-card .ifel-main > h3,
+  .ifel-card .ifel-main > .ifel-subtitle,
+  .ifel-main .ifel-block {
+    opacity: 1;
+    transform: none;
+    transition: none;
     will-change: auto;
   }
 }
@@ -843,6 +860,24 @@ function renderStep(index) {
       </div>
     </div>
   `;
+
+  const stageMain = document.querySelector("#ifel-learning-engine .ifel-main");
+  if (stageMain) {
+    const animatedCards = stageMain.querySelectorAll(".ifel-block");
+
+    animatedCards.forEach((card, index) => {
+      card.style.setProperty("--ifel-stagger-delay", `${index * 60}ms`);
+    });
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        stageMain.classList.add("ifel-stage-visible");
+        animatedCards.forEach(card => {
+          card.classList.add("ifel-block-visible");
+        });
+      });
+    });
+  }
 
   const progressBar = document.querySelector("#ifel-learning-engine .ifel-progress-bar");
   if (progressBar) {

@@ -125,6 +125,34 @@
   border: 1px solid rgba(16, 42, 67, 0.08);
 }
 
+.ifel-image-stage {
+  position: relative;
+}
+
+.ifel-image-stage img {
+  transition: opacity 400ms ease-in-out;
+}
+
+.ifel-image-current {
+  opacity: 0;
+}
+
+.ifel-image-previous {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  opacity: 1;
+  z-index: 2;
+}
+
+.ifel-image-stage.ifel-image-visible .ifel-image-current {
+  opacity: 1;
+}
+
+.ifel-image-stage.ifel-image-visible .ifel-image-previous {
+  opacity: 0;
+}
+
 .ifel-card .ifel-main > .ifel-badge,
 .ifel-card .ifel-main > h3,
 .ifel-card .ifel-main > .ifel-subtitle {
@@ -143,8 +171,8 @@
 
 .ifel-main .ifel-block {
   opacity: 0;
-  transform: translateY(10px);
-  transition: opacity 300ms ease-out, transform 300ms ease-out;
+  transform: translateY(18px);
+  transition: opacity 700ms ease-out, transform 700ms ease-out;
   transition-delay: var(--ifel-stagger-delay, 0ms);
   will-change: opacity, transform;
 }
@@ -424,11 +452,16 @@
   .ifel-card .ifel-main > .ifel-badge,
   .ifel-card .ifel-main > h3,
   .ifel-card .ifel-main > .ifel-subtitle,
-  .ifel-main .ifel-block {
+  .ifel-main .ifel-block,
+  .ifel-image-current {
     opacity: 1;
     transform: none;
     transition: none;
     will-change: auto;
+  }
+
+  .ifel-image-previous {
+    display: none;
   }
 }
 </style>
@@ -446,6 +479,9 @@ let themes = {};
 let settings = {};
 let components = {};
 let currentStep = 0;
+let currentImageUrl = "";
+let renderStepRequest = 0;
+const imagePreloadCache = {};
 
 function parseCSV(text) {
   const rows = [];
@@ -792,6 +828,51 @@ function getHeroTitle(step) {
   return hero && hero.titolo ? hero.titolo : "";
 }
 
+function getStepImageBlock(step) {
+  return step.blocks.find(b => b.blocco === "image");
+}
+
+function getStepImageUrl(step) {
+  const imageBlock = getStepImageBlock(step);
+  return imageBlock && imageBlock.url ? imageBlock.url : "";
+}
+
+function preloadImage(url) {
+  if (!url) return Promise.resolve("");
+  if (imagePreloadCache[url]) return imagePreloadCache[url];
+
+  imagePreloadCache[url] = new Promise(resolve => {
+    const image = new Image();
+    image.onload = () => resolve(url);
+    image.onerror = () => resolve(url);
+    image.src = url;
+  });
+
+  return imagePreloadCache[url];
+}
+
+function preloadNextStageImage(index) {
+  if (!ifelData.length) return;
+
+  const nextIndex = index < ifelData.length - 1 ? index + 1 : 0;
+  preloadImage(getStepImageUrl(ifelData[nextIndex]));
+}
+
+function renderEditorialImage(imageBlock, previousImageUrl, nextImageUrl) {
+  if (!nextImageUrl) return "";
+
+  const previousImage = previousImageUrl && previousImageUrl !== nextImageUrl
+    ? `<img class="ifel-image-previous" src="${previousImageUrl}" alt="">`
+    : "";
+
+  return `
+    <div class="ifel-image-stage">
+      ${previousImage}
+      <img class="ifel-image-current" src="${nextImageUrl}" alt="${imageBlock.titolo || ""}">
+    </div>
+  `;
+}
+
 function renderCompletion() {
   if (!normalizeBool(settings.show_completion, true)) return "";
   if (currentStep !== ifelData.length - 1) return "";
@@ -830,14 +911,22 @@ function renderChapterFooter() {
   `;
 }
 
-function renderStep(index) {
-  currentStep = index;
+async function renderStep(index) {
+  const requestId = ++renderStepRequest;
   const step = ifelData[index];
+  const imageBlock = getStepImageBlock(step);
+  const nextImageUrl = getStepImageUrl(step);
+  const previousImageUrl = currentImageUrl;
+
+  await preloadImage(nextImageUrl);
+  if (requestId !== renderStepRequest) return;
+
+  currentStep = index;
   const theme = getStepTheme(step);
   applyTheme(theme);
 
-  const imageBlock = step.blocks.find(b => b.blocco === "image");
   const contentBlocks = step.blocks.map(renderBlock).join("");
+  const editorialImage = renderEditorialImage(imageBlock, previousImageUrl, nextImageUrl);
 
   document.getElementById("ifel-learning-engine").innerHTML = `
     <div class="ifel-header">
@@ -850,7 +939,7 @@ function renderStep(index) {
 
     <div class="ifel-card">
       <div class="ifel-media">
-        ${imageBlock && imageBlock.url ? `<img src="${imageBlock.url}" alt="${imageBlock.titolo || ""}">` : ""}
+        ${editorialImage}
       </div>
 
       <div class="ifel-main">
@@ -861,20 +950,32 @@ function renderStep(index) {
     </div>
   `;
 
+  currentImageUrl = nextImageUrl;
+  preloadNextStageImage(index);
+
+  const imageStage = document.querySelector("#ifel-learning-engine .ifel-image-stage");
   const stageMain = document.querySelector("#ifel-learning-engine .ifel-main");
   if (stageMain) {
     const animatedCards = stageMain.querySelectorAll(".ifel-block");
 
     animatedCards.forEach((card, index) => {
-      card.style.setProperty("--ifel-stagger-delay", `${index * 60}ms`);
+      card.style.setProperty("--ifel-stagger-delay", `${index * 180}ms`);
     });
+
+    const cardStartDelay = imageStage ? 160 : 0;
 
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        stageMain.classList.add("ifel-stage-visible");
-        animatedCards.forEach(card => {
-          card.classList.add("ifel-block-visible");
-        });
+        if (imageStage) {
+          imageStage.classList.add("ifel-image-visible");
+        }
+
+        setTimeout(() => {
+          stageMain.classList.add("ifel-stage-visible");
+          animatedCards.forEach(card => {
+            card.classList.add("ifel-block-visible");
+          });
+        }, cardStartDelay);
       });
     });
   }
